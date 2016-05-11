@@ -4,10 +4,6 @@ import numpy as np
 import argparse
 LINE_NUM = 7
 
-def parse_args():
-	
-	args = parser.parse_args()
-
 def parse_result():
     fp = open("temp.txt")
     for i, line in enumerate(fp):
