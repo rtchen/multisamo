@@ -8,17 +8,19 @@ array[1..npos,1..nAminos,1..nAminos] of var 0..1:y;
 
 
 constraint 
-forall (i in 1..nProteins)(
-    sum(j in (i-1)*npos+1..i*npos)(
+forall(i in 1..npos)(
+forall (k in 1..nProteins)(
+    sum(j in (k-1)*npos+1..k*npos)(
      s[i,j] 
-   )==1
+   )<=1
+)
 );
 
 constraint 
 forall (j in 1..nAminos)(
    sum(i in 1..npos)(
      s[i,j] 
-   )==1
+   )<=1
 );
 
 constraint
