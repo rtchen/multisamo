@@ -8,7 +8,7 @@ def parse_result():
     fp = open("temp.txt")
     for i, line in enumerate(fp):
        if i == LINE_NUM:
-          matches = [int(s) for s in line.split() if s.isdigit()]
+          matches = [int(s) for s in line.split()]
     fp.close()
     return matches
 
@@ -25,7 +25,7 @@ if __name__== "__main__" :
       sys.exit("not enough proteins")
    for i in range(numProteins):
       for j in range(i+1,numProteins):
-         command = "samo0.exe -pocket %s %s -os temp.txt"%(pairs[i],pairs[j])
+         command = "samo0.exe -pocket %s %s -os temp.txt>screen.txt"%(pairs[i],pairs[j])
          os.system(command)
          fp = open("temp.txt")
          matches = parse_result()
@@ -33,13 +33,14 @@ if __name__== "__main__" :
             numAminos= len(matches)
             distance = np.zeros((numAminos*numProteins,numAminos*numProteins),dtype = int)
          for k in range(numAminos):
-            if k!=-1:
-               aminoj = (i-1)*numAminos+k
-               aminok = (j-1)*numAminos+matches[k]
+            if matches[k]!=-1:
+               aminoj = i*numAminos+k
+               aminok = j*numAminos+matches[k]
                distance[aminoj][aminok] = 1
                distance[aminok][aminoj] = 1
    fp.close()
    os.system("del temp.txt")
+   os.system("del screen.txt")
    fp = open(outputFile,'w')
    fp.write("int: npos = %d;\n" % (numAminos))
    fp.write("int: nProteins= %d;\n" % (numProteins))
