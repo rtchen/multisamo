@@ -118,9 +118,8 @@ def multiple_align(clique_map,aligned,priority,numProteins,classification,matche
     while(len(aligned)!=numProteins):
         protein = priority.index(max(priority))
         add_layer(classification,matches,class_sets,numPos,protein,priority)
-        print objective
         update_priority(clique_map,aligned,numProteins,priority,protein)
-
+        
 
 
 if __name__== "__main__" :
@@ -146,7 +145,8 @@ if __name__== "__main__" :
    add_layer(classification,matches,class_sets,numPos,seeds[2],priority)
    update_priority(clique_map,aligned,numProteins,priority,seeds[2])
    multiple_align(clique_map,aligned,priority,numProteins,classification,matches,class_sets,numPos)
-   print objective
+   print objective *2 # notice that in integer programming the objective of every connected edge is counted twice, so Im 
+                      # multiplying 2 here just for comparison
    print classification
 
 
