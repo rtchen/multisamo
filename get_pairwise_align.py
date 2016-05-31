@@ -4,9 +4,9 @@ import numpy as np
 import argparse
 LINE_NUM = 7
 
+
 def parse_args():
-	
-	args = parser.parse_args()
+    args = parser.parse_args()
 
 def parse_result():
     fp = open("temp.txt")
@@ -19,44 +19,50 @@ def parse_result():
 if __name__== "__main__" :
    parser = argparse.ArgumentParser(description='protein alignment in a cluster')
    parser.add_argument('-c', '--clusterFile',help='cluster file')
-   parser.add_argument('-o','--outputFile',help='output distance file, suffix has to be dzn ')
+   parser.add_argument('-o','--outputFile',help='output distance file')
    args = parser.parse_args()
    clusterFile = args.clusterFile
    outputFile = args.outputFile
    pairs = [pairs.rstrip('\n') for pairs in open(clusterFile)]
    numProteins = len(pairs)
+   numPairs = numProteins*numProteins
+   aminoLen = [0]*numProteins
+   matches = [None]*numPairs
    if numProteins < 2:
       sys.exit("not enough proteins")
    for i in range(numProteins):
       for j in range(i+1,numProteins):
          command = "samo0.exe -pocket %s %s -os temp.txt > screen.txt"%(pairs[i],pairs[j])
          os.system(command)
-         fp = open("temp.txt")
-         matches = parse_result()
-         if i==0 and j==1:
-            numAminos= len(matches)
-            distance = np.zeros((numAminos*numProteins,numAminos*numProteins),dtype = int)
-         for k in range(numAminos):
-            if matches[k]!=-1:
-               aminoj = i*numAminos+k
-               aminok = j*numAminos+matches[k]
-               distance[aminoj][aminok] = 1
-               distance[aminok][aminoj] = 1
-   fp.close()
+         matches[i*numProteins+j] = parse_result()
+         if j==i+1:
+            aminoLen[i]=len(matches[i*numProteins+j])
+   command = "samo0.exe -pocket %s %s -os temp.txt > screen.txt"%(pairs[numProteins-1],pairs[numProteins-1])
+   os.system(command)
+   matches[numProteins*numProteins-1] = parse_result()
+   aminoLen[numProteins-1] = len(matches[numProteins*numProteins-1])
+   numPos = max(aminoLen)
+   numAminos = numPos * numProteins;
+   distance = np.zeros((numAminos,numAminos),dtype = int)
+   for i in range(numProteins):
+      for j in range(i+1,numProteins): 
+        for k in range(len(matches[i*numProteins+j])):
+          if matches[i*numProteins+j][k]!=-1:
+             aminoj = i*numPos+k
+             aminok = j*numPos+matches[i*numProteins+j][k]
+             distance[aminoj][aminok] = 1
+             distance[aminok][aminoj] = 1
    os.system("del temp.txt")
    os.system("del screen.txt")
    fp = open(outputFile,'w')
-   fp.write("int: npos = %d;\n" % (numAminos))
+   fp.write("int: npos = %d;\n" % (numPos))
    fp.write("int: nProteins= %d;\n" % (numProteins))
    fp.write("array[1..nAminos,1..nAminos] of int: adj=\n")
    fp.write("[")
-   for i in range(numAminos*numProteins):
+   for i in range(numAminos):
     fp.write("|")
-    for j in range(numAminos*numProteins-1):
+    for j in range(numAminos-1):
       fp.write("%d ," % distance[i][j])
-    fp.write("%d\n" % distance[i][numAminos*numProteins-1])
+    fp.write("%d\n" % distance[i][numAminos-1])
    fp.write("|];\n")
    fp.close()
-
-
-
