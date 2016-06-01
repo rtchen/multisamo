@@ -56,7 +56,7 @@ def align_seeds(classification, matches, seeds,class_sets,numPos):
        for j in range(numPos):
            if matches[proteinB*numPos+i][proteinA*numPos+j] == 1:
               class_sets[j].append(proteinB*numPos+i)
-              classification[proteinB][i] = j
+              classification[proteinB][j] = i
               objective = objective + 1
               flag = 1
        if flag == 0:
@@ -65,7 +65,7 @@ def align_seeds(classification, matches, seeds,class_sets,numPos):
         for j in range(numPos):
             if(len(class_sets[j])<2):
                class_sets[j].append(proteinB*i+unclassed[i])
-               classification[proteinB][unclassed[i]] = j
+               classification[proteinB][j] = unclassed[i]
                break
 
 def add_layer(classification,matches,class_sets,numPos,protein,priority):
@@ -89,7 +89,7 @@ def add_layer(classification,matches,class_sets,numPos,protein,priority):
 	objective = objective + maxEdgeSum
 	for i in range(numPos):
 	    class_sets[maxPerm[i]].append(protein*numPos+i)
-	    classification[protein][i] = maxPerm[i]
+	    classification[protein][maxPerm[i]] = i
 	priority[protein] = -1
   
 
